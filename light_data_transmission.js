@@ -73,10 +73,11 @@ function sendBits(bit, position, transition_state) {
     //end recursive cycle
     return false 
   }
+  let fps=parseInt(document.getElementsByTagName("input")[0].value)
   setTimeout(() => {
       let next_position=(!transition_state)?position + 1:position
     sendBits(parseInt(textarea_value[next_position]), next_position,!transition_state);
-  }, 1000);
+  }, Math.round(1000/fps,0));
 }
 function sendData(state) {
   const button = document.getElementsByTagName("button")[0];
