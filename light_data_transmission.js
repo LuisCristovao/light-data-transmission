@@ -1,34 +1,34 @@
 var ABC = {
-    toAscii: function (bin) {
-      return bin.replace(/\s*[01]{8}\s*/g, function (bin) {
-        return String.fromCharCode(parseInt(bin, 2));
-      });
-    },
-    toBinary: function (str, spaceSeparatedOctets) {
-      return str.replace(/[\s\S]/g, function (str) {
-        str = ABC.zeroPad(str.charCodeAt().toString(2));
-        return !1 == spaceSeparatedOctets ? str : str + " ";
-      });
-    },
-    zeroPad: function (num) {
-      return "00000000".slice(String(num).length) + num;
-    },
-  };
-
+  toAscii: function (bin) {
+    return bin.replace(/\s*[01]{8}\s*/g, function (bin) {
+      return String.fromCharCode(parseInt(bin, 2));
+    });
+  },
+  toBinary: function (str, spaceSeparatedOctets) {
+    return str.replace(/[\s\S]/g, function (str) {
+      str = ABC.zeroPad(str.charCodeAt().toString(2));
+      return !1 == spaceSeparatedOctets ? str : str + " ";
+    });
+  },
+  zeroPad: function (num) {
+    return "00000000".slice(String(num).length) + num;
+  },
+};
 
 function insertHtml(html) {
   document.body.innerHTML = html;
 }
 async function createSendDataPage() {
-  const res= await fetch("sendData.html")
-  const html=await res.text()
+  const res = await fetch("sendData.html");
+  const html = await res.text();
   insertHtml(html);
+  setTimeout(() => {
+    canvasColor("rgb(255,0,0,1)");
+  }, 300);
 }
-function createReadDataPage(){
-
-}
-function goToLink(search_link){
-    window.location.search=search_link
+function createReadDataPage() {}
+function goToLink(search_link) {
+  window.location.search = search_link;
 }
 function createHomePage() {
   let height = window.innerHeight;
@@ -41,22 +41,84 @@ function createHomePage() {
   }px'>Send Data</button>`;
   insertHtml(html);
 }
-
-function textToBinary(textarea_el){
-    const binary_value=ABC.toBinary(textarea_el.value)
-    textarea_el.value=binary_value
+//algoritmos----
+function textToBinary(textarea_el) {
+  const binary_value = ABC.toBinary(textarea_el.value);
+  textarea_el.value = binary_value.replaceAll(" ","");
+}
+function canvasColor(color) {
+  var c = document.getElementsByTagName("canvas")[0];
+  var ctx = c.getContext("2d");
+  ctx.fillStyle = color;
+  ctx.fillRect(0, 0, parseInt(c.width), parseInt(c.height));
+}
+function sendBits(bit, position) {
+  let textarea_value = document.getElementsByTagName("textarea")[0].value;
+  let state_machine = {
+    0: () => {
+      canvasColor("rgba(255,255,255)");
+    },
+    1: () => {
+      canvasColor("rgba(0,0,0)");
+    },
+  };
+  try {
+    state_machine[bit]();
+  } catch {
+    canvasColor("rgba(0,255,0)");
+  }
+  setTimeout(() => {
+    sendBits(parseInt(textarea_value[position+1]),position+1);
+  }, 1000);
+}
+function sendData(state) {
+  const button = document.getElementsByTagName("button")[0];
+  let state_machine = {
+    start: () => {
+      setTimeout(() => {
+        let textarea_el = document.getElementsByTagName("textarea")[0];
+        textToBinary(textarea_el);
+        button.innerText = "Starting in : 3 seconds";
+        sendData("1s");
+      }, 1000);
+    },
+    "1s": () => {
+      setTimeout(() => {
+        button.innerText = "Starting in : 2 seconds";
+        sendData("2s");
+      }, 1000);
+    },
+    "2s": () => {
+      setTimeout(() => {
+        button.innerText = "Starting in : 1 seconds";
+        sendData("3s");
+      }, 1000);
+    },
+    "3s": () => {
+      setTimeout(() => {
+        button.innerText = "Sending Bits !";
+        sendData("send-bits");
+      }, 1000);
+    },
+    "send-bits": () => {
+      let textarea_value = document.getElementsByTagName("textarea")[0].value;
+      sendBits(parseInt(textarea_value[0]),0);
+    },
+  };
+  state_machine[state]();
 }
 
+//-----------
 function selectPage() {
   const pages = {
-      "":createHomePage,
-      "?Send":createSendDataPage,
-      "?Receive":createReadDataPage
+    "": createHomePage,
+    "?Send": createSendDataPage,
+    "?Receive": createReadDataPage,
   };
-  pages[window.location.search]()
+  pages[window.location.search]();
 }
 
 //Main--------------
 window.onload = () => {
-    selectPage()
+  selectPage();
 };
