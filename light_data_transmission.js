@@ -44,7 +44,7 @@ function createHomePage() {
 //algoritmos----
 function textToBinary(textarea_el) {
   const binary_value = ABC.toBinary(textarea_el.value);
-  textarea_el.value = binary_value.replaceAll(" ","");
+  textarea_el.value = binary_value.replaceAll(" ", "");
 }
 function canvasColor(color) {
   var c = document.getElementsByTagName("canvas")[0];
@@ -52,7 +52,7 @@ function canvasColor(color) {
   ctx.fillStyle = color;
   ctx.fillRect(0, 0, parseInt(c.width), parseInt(c.height));
 }
-function sendBits(bit, position) {
+function sendBits(bit, position, transition_state) {
   let textarea_value = document.getElementsByTagName("textarea")[0].value;
   let state_machine = {
     0: () => {
@@ -63,12 +63,19 @@ function sendBits(bit, position) {
     },
   };
   try {
-    state_machine[bit]();
+    if (!transition_state) {
+      state_machine[bit]();
+    } else {
+      canvasColor("rgba(0,0,255)");
+    }
   } catch {
     canvasColor("rgba(0,255,0)");
+    //end recursive cycle
+    return false 
   }
   setTimeout(() => {
-    sendBits(parseInt(textarea_value[position+1]),position+1);
+      let next_position=(!transition_state)?position + 1:position
+    sendBits(parseInt(textarea_value[next_position]), next_position,!transition_state);
   }, 1000);
 }
 function sendData(state) {
@@ -102,7 +109,7 @@ function sendData(state) {
     },
     "send-bits": () => {
       let textarea_value = document.getElementsByTagName("textarea")[0].value;
-      sendBits(parseInt(textarea_value[0]),0);
+      sendBits(parseInt(textarea_value[0]), 0,false);
     },
   };
   state_machine[state]();
