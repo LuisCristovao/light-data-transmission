@@ -1,3 +1,4 @@
+//import LZString from "./lz-string.js";
 var ABC = {
   toAscii: function (bin) {
     return bin.replace(/\s*[01]{8}\s*/g, function (bin) {
@@ -71,27 +72,33 @@ function sendBits(bit, position, transition_state) {
   } catch {
     canvasColor("rgba(0,255,0)");
     //end recursive cycle
-    return false 
+    return false;
   }
-  let fps=parseInt(document.getElementsByTagName("input")[0].value)
+  let fps = parseInt(document.getElementsByTagName("input")[0].value);
   setTimeout(() => {
-      let next_position=(!transition_state)?position + 1:position
-    sendBits(parseInt(textarea_value[next_position]), next_position,!transition_state);
-  }, Math.round(1000/fps,0));
+    let next_position = !transition_state ? position + 1 : position;
+    sendBits(
+      parseInt(textarea_value[next_position]),
+      next_position,
+      !transition_state
+    );
+  }, Math.round(1000 / fps, 0));
 }
 function sendData(state) {
   const button = document.getElementsByTagName("button")[0];
   let state_machine = {
     start: () => {
       setTimeout(() => {
-        let textarea_el = document.getElementsByTagName("textarea")[0];
-        textToBinary(textarea_el);
+        //let textarea_el = document.getElementsByTagName("textarea")[0];
+        //textarea_el.value=LZString.compressToEncodedURIComponent(textarea_el.value);
         button.innerText = "Starting in : 3 seconds";
         sendData("1s");
       }, 1000);
     },
     "1s": () => {
       setTimeout(() => {
+        let textarea_el = document.getElementsByTagName("textarea")[0];
+        textToBinary(textarea_el);
         button.innerText = "Starting in : 2 seconds";
         sendData("2s");
       }, 1000);
@@ -110,7 +117,7 @@ function sendData(state) {
     },
     "send-bits": () => {
       let textarea_value = document.getElementsByTagName("textarea")[0].value;
-      sendBits(parseInt(textarea_value[0]), 0,false);
+      sendBits(parseInt(textarea_value[0]), 0, false);
     },
   };
   state_machine[state]();
