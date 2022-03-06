@@ -75,7 +75,7 @@ function stateMachine(color) {
     real_state = "white";
   }
   //if black
-  if ((color[0] <= 50) & (color[1] <= 50) & (color[2] <= 50)) {
+  if ((color[0] <= 10) & (color[1] <= 10) & (color[2] <= 10)) {
     real_state = "black";
   }
 
