@@ -67,35 +67,31 @@ function createHomePage() {
 
 // receive Data algoritmos ------
 function stateMachine(color) {
-  let real_state = "red";
+  let real_state = "no state";
   let user_info = document.getElementsByTagName("h1")[0];
   //categorize state
   //if white
   if ((color[0] >= 200) & (color[1] >= 200) & (color[2] >= 200)) {
     real_state = "white";
-  } else {
-    //if black
-    if ((color[0] <= 10) & (color[1] <= 10) & (color[2] <= 10)) {
-      real_state = "black";
-    }
-
-    //if red
-    if ((color[0] > color[1]) & (color[0] > color[2])) {
-      real_state = "red";
-    } else {
-      //if green
-      if ((color[1] > color[0]) & (color[1] > color[2])) {
-        real_state = "green";
-      } else {
-        //if blue
-        if ((color[2] > color[0]) & (color[2] > color[1])) {
-          real_state = "green";
-        } else {
-          real_state = "no state";
-        }
-      }
-    }
   }
+  //if black
+  if ((color[0] <= 50) & (color[1] <= 50) & (color[2] <= 50)) {
+    real_state = "black";
+  }
+
+  //if red
+  if ((color[0] > color[1]) & (color[0] > color[2]) & color[0]>=200) {
+    real_state = "red";
+  }
+  //if green
+  if ((color[1] > color[0]) & (color[1] > color[2]) & color[1]>=200) {
+    real_state = "green";
+  }
+  //if blue
+  if ((color[2] > color[0]) & (color[2] > color[1]) & color[2]>=200) {
+    real_state = "blue";
+  }
+
   let textarea_el = document.getElementsByTagName("textarea")[0];
   let actions = {
     red: () => {
@@ -125,6 +121,7 @@ function stateMachine(color) {
       user_info.innerHTML = "No State";
     },
   };
+  //user_info.innerHTML=`rgb(${color[0]},${color[1]},${color[2]})`
   actions[real_state]();
 }
 function readCenterPixel(context, canvas) {
