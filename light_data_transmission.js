@@ -68,61 +68,64 @@ function createHomePage() {
 // receive Data algoritmos ------
 function stateMachine(color) {
   let real_state = "red";
-  let user_info=document.getElementsByTagName("h1")[0]
+  let user_info = document.getElementsByTagName("h1")[0];
   //categorize state
   //if white
-    if (color[0]>=200 & color[1]>=200 & color[2]>=200) {
-      real_state = "white";
-    }else{
-      //if black
-      if(color[0]<=100 & color[1]<=100 & color[2]<=100){
-        real_state="black"
-      }
-      //if red
-      if ((color[0] > color[1]) & (color[0] > color[2])) {
-        real_state = "red";
+  if ((color[0] >= 200) & (color[1] >= 200) & (color[2] >= 200)) {
+    real_state = "white";
+  } else {
+    //if black
+    if ((color[0] <= 10) & (color[1] <= 10) & (color[2] <= 10)) {
+      real_state = "black";
+    }
+
+    //if red
+    if ((color[0] > color[1]) & (color[0] > color[2])) {
+      real_state = "red";
+    } else {
+      //if green
+      if ((color[1] > color[0]) & (color[1] > color[2])) {
+        real_state = "green";
       } else {
-        //if green
-        if ((color[1] > color[0]) & (color[1] > color[2])) {
+        //if blue
+        if ((color[2] > color[0]) & (color[2] > color[1])) {
           real_state = "green";
         } else {
-          //if blue
-          if ((color[2] > color[0]) & (color[2] > color[1])) {
-            real_state = "green";
-          }
-          else{
-            real_state="no state"
-          }
+          real_state = "no state";
         }
       }
     }
-    let textarea_el=document.getElementsByTagName("textarea")[0]
-    let actions={
-      "red":()=>{
-        //waiting to start
-        user_info.innerHTML="Waiting to receive Data"
-      },
-      "green":()=>{
-        //finish
-        user_info.innerHTML="Finished receiving Data"
-      },
-      "blue":()=>{
-        //transition state
-      },
-      "white":()=>{
-        //0 value
-        textarea_el.value+="0"
-      },
-      "black":()=>{
-        //1 value
-        textarea_el.value+="0"
-      },
-      "no state":()=>{
-        //just wait
-        user_info.innerHTML="Waiting to receive Data"
-      }
-    }
-    actions[real_state]()
+  }
+  let textarea_el = document.getElementsByTagName("textarea")[0];
+  let actions = {
+    red: () => {
+      //waiting to start
+      user_info.innerHTML = "Waiting to receive Data";
+    },
+    green: () => {
+      //finish
+      user_info.innerHTML = "Finished receiving Data";
+    },
+    blue: () => {
+      //transition state
+      user_info.innerHTML = "Blue";
+    },
+    white: () => {
+      //0 value
+      user_info.innerHTML = "White";
+      textarea_el.value += "0";
+    },
+    black: () => {
+      //1 value
+      user_info.innerHTML = "Black";
+      textarea_el.value += "1";
+    },
+    "no state": () => {
+      //just wait
+      user_info.innerHTML = "No State";
+    },
+  };
+  actions[real_state]();
 }
 function readCenterPixel(context, canvas) {
   var pixel = context.getImageData(
@@ -163,8 +166,8 @@ function drawVideo() {
     parseInt(canvas.width),
     parseInt(canvas.height)
   );
-  let color=readCenterPixel(context, canvas);
-  stateMachine(color)
+  let color = readCenterPixel(context, canvas);
+  stateMachine(color);
   drawCaptureZone(context, canvas);
   requestAnimationFrame(drawVideo);
 }
