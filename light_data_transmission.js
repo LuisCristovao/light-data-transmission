@@ -64,7 +64,66 @@ function createHomePage() {
   }px'>Send Data</button>`;
   insertHtml(html);
 }
+
 // receive Data algoritmos ------
+function stateMachine(color) {
+  let real_state = "red";
+  let user_info=document.getElementsByTagName("h1")[0]
+  //categorize state
+  //if white
+    if (color[0]>=200 & color[1]>=200 & color[2]>=200) {
+      real_state = "white";
+    }else{
+      //if black
+      if(color[0]<=100 & color[1]<=100 & color[2]<=100){
+        real_state="black"
+      }
+      //if red
+      if ((color[0] > color[1]) & (color[0] > color[2])) {
+        real_state = "red";
+      } else {
+        //if green
+        if ((color[1] > color[0]) & (color[1] > color[2])) {
+          real_state = "green";
+        } else {
+          //if blue
+          if ((color[2] > color[0]) & (color[2] > color[1])) {
+            real_state = "green";
+          }
+          else{
+            real_state="no state"
+          }
+        }
+      }
+    }
+    let textarea_el=document.getElementsByTagName("textarea")[0]
+    let actions={
+      "red":()=>{
+        //waiting to start
+        user_info.innerHTML="Waiting to receive Data"
+      },
+      "green":()=>{
+        //finish
+        user_info.innerHTML="Finished receiving Data"
+      },
+      "blue":()=>{
+        //transition state
+      },
+      "white":()=>{
+        //0 value
+        textarea_el.value+="0"
+      },
+      "black":()=>{
+        //1 value
+        textarea_el.value+="0"
+      },
+      "no state":()=>{
+        //just wait
+        user_info.innerHTML="Waiting to receive Data"
+      }
+    }
+    actions[real_state]()
+}
 function readCenterPixel(context, canvas) {
   var pixel = context.getImageData(
     parseInt(canvas.width) / 2,
@@ -76,14 +135,20 @@ function readCenterPixel(context, canvas) {
   var rgba =
     "rgba(" + data[0] + "," + data[1] + "," + data[2] + "," + data[3] + ")";
   document.getElementsByTagName("div")[0].style["background-color"] = rgba;
-  
+  console.log(rgba[0]);
+  return data;
 }
 function drawCaptureZone(ctx, canvas) {
   // Red rectangle
   ctx.beginPath();
   ctx.lineWidth = "2";
   ctx.strokeStyle = "white";
-  ctx.rect((parseInt(canvas.width)/2)-5, (parseInt(canvas.height)/2)-5, 10, 10);
+  ctx.rect(
+    parseInt(canvas.width) / 2 - 5,
+    parseInt(canvas.height) / 2 - 5,
+    10,
+    10
+  );
   ctx.stroke();
 }
 function drawVideo() {
@@ -98,7 +163,8 @@ function drawVideo() {
     parseInt(canvas.width),
     parseInt(canvas.height)
   );
-  readCenterPixel(context, canvas);
+  let color=readCenterPixel(context, canvas);
+  stateMachine(color)
   drawCaptureZone(context, canvas);
   requestAnimationFrame(drawVideo);
 }
