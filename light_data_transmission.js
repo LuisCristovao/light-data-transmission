@@ -27,7 +27,29 @@ async function createSendDataPage() {
     canvasColor("rgb(255,0,0,1)");
   }, 300);
 }
-function createReadDataPage() {}
+async function createReadDataPage() {
+  const res = await fetch("receiveData.html");
+  const html = await res.text();
+  insertHtml(html);
+  setTimeout(() => {
+    // Grab elements, create settings, etc.
+    const video = document.getElementsByTagName("video")[0];
+
+    // Get access to the camera!
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      // Not adding `{ audio: true }` since we only want video now
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then(function (stream) {
+          //video.src = window.URL.createObjectURL(stream);
+          video.srcObject = stream;
+          video.play();
+        });
+    }
+    
+    requestAnimationFrame(drawVideo)
+  }, 1000);
+}
 function goToLink(search_link) {
   window.location.search = search_link;
 }
@@ -42,7 +64,17 @@ function createHomePage() {
   }px'>Send Data</button>`;
   insertHtml(html);
 }
-//algoritmos----
+// receive Data algoritmos ------
+function drawVideo(){
+  // Elements for taking the snapshot
+  const canvas = document.getElementsByTagName("canvas")[0];
+  const context = canvas.getContext("2d");
+  const video = document.getElementsByTagName("video")[0];
+  context.drawImage(video, 0, 0, parseInt(canvas.width), parseInt(canvas.height));
+  requestAnimationFrame(drawVideo)
+}
+//----------
+//Send Data algoritmos----
 function textToBinary(textarea_el) {
   const binary_value = ABC.toBinary(textarea_el.value);
   textarea_el.value = binary_value.replaceAll(" ", "");
