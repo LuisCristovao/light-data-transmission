@@ -46,8 +46,8 @@ async function createReadDataPage() {
           video.play();
         });
     }
-    
-    requestAnimationFrame(drawVideo)
+
+    requestAnimationFrame(drawVideo);
   }, 1000);
 }
 function goToLink(search_link) {
@@ -65,13 +65,42 @@ function createHomePage() {
   insertHtml(html);
 }
 // receive Data algoritmos ------
-function drawVideo(){
+function readCenterPixel(context, canvas) {
+  var pixel = context.getImageData(
+    parseInt(canvas.width) / 2,
+    parseInt(canvas.height) / 2,
+    1,
+    1
+  );
+  var data = pixel.data;
+  var rgba =
+    "rgba(" + data[0] + "," + data[1] + "," + data[2] + "," + data[3] + ")";
+  document.getElementsByTagName("div")[0].style["background-color"] = rgba;
+  
+}
+function drawCaptureZone(ctx, canvas) {
+  // Red rectangle
+  ctx.beginPath();
+  ctx.lineWidth = "2";
+  ctx.strokeStyle = "white";
+  ctx.rect((parseInt(canvas.width)/2)-5, (parseInt(canvas.height)/2)-5, 10, 10);
+  ctx.stroke();
+}
+function drawVideo() {
   // Elements for taking the snapshot
   const canvas = document.getElementsByTagName("canvas")[0];
   const context = canvas.getContext("2d");
   const video = document.getElementsByTagName("video")[0];
-  context.drawImage(video, 0, 0, parseInt(canvas.width), parseInt(canvas.height));
-  requestAnimationFrame(drawVideo)
+  context.drawImage(
+    video,
+    0,
+    0,
+    parseInt(canvas.width),
+    parseInt(canvas.height)
+  );
+  readCenterPixel(context, canvas);
+  drawCaptureZone(context, canvas);
+  requestAnimationFrame(drawVideo);
 }
 //----------
 //Send Data algoritmos----
@@ -103,6 +132,7 @@ function sendBits(bit, position, transition_state) {
     }
   } catch {
     canvasColor("rgba(0,255,0)");
+
     //end recursive cycle
     return false;
   }
@@ -123,6 +153,7 @@ function sendData(state) {
       setTimeout(() => {
         //let textarea_el = document.getElementsByTagName("textarea")[0];
         //textarea_el.value=LZString.compressToEncodedURIComponent(textarea_el.value);
+        canvasColor("rgba(255,0,0)");
         button.innerText = "Starting in : 3 seconds";
         sendData("1s");
       }, 1000);
