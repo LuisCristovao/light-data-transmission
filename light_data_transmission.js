@@ -15,7 +15,25 @@ var ABC = {
     return "00000000".slice(String(num).length) + num;
   },
 };
-
+const RGBToHSL = (r, g, b) => {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  const l = Math.max(r, g, b);
+  const s = l - Math.min(r, g, b);
+  const h = s
+    ? l === r
+      ? (g - b) / s
+      : l === g
+      ? 2 + (b - r) / s
+      : 4 + (r - g) / s
+    : 0;
+  return [
+    60 * h < 0 ? 60 * h + 360 : 60 * h,
+    100 * (s ? (l <= 0.5 ? s / (2 * l - s) : s / (2 - (2 * l - s))) : 0),
+    (100 * (2 * l - s)) / 2,
+  ];
+};
 function insertHtml(html) {
   document.body.innerHTML = html;
 }
@@ -66,41 +84,47 @@ function createHomePage() {
 }
 
 // receive Data algoritmos ------
-function stateMachine(color) {
+function detectState(color){
   let real_state = "no state";
-  let user_info = document.getElementsByTagName("h1")[0];
-  //categorize state
-  //if white
-  if ((color[0] >= 200) & (color[1] >= 200) & (color[2] >= 200)) {
-    real_state = "white";
-  }
-  //if black
-  if ((color[0] <= 10) & (color[1] <= 10) & (color[2] <= 10)) {
-    real_state = "black";
-  }
-
   //if red
-  if ((color[0] > color[1]) & (color[0] > color[2]) & color[0]>=200) {
+  if (color[0] <=31 ) {
     real_state = "red";
   }
   //if green
-  if ((color[1] > color[0]) & (color[1] > color[2]) & color[1]>=200) {
+  if (color[0] >=98 & color[0]<=147) {
     real_state = "green";
   }
   //if blue
-  if ((color[2] > color[0]) & (color[2] > color[1]) & color[2]>=200) {
+  if (color[0] >=193 & color[0]<=244) {
     real_state = "blue";
   }
-
+  //if white
+  if (color[2] >= 96) {
+    real_state = "white";
+  }
+  //if black
+  if (color[2] <= 3) {
+    real_state = "black";
+  }
+  return real_state
+}
+function stateMachine(color,prev_color) {
+  let actual_state = "no state";
+  let prev_state=actual_state
+  let user_info = document.getElementsByTagName("h1")[0];
+  //categorize state
+  actual_state=detectState(color)
+  prev_state=detectState(prev_color)
+  
   let textarea_el = document.getElementsByTagName("textarea")[0];
   let actions = {
     red: () => {
       //waiting to start
-      user_info.innerHTML = "Waiting to receive Data";
+      user_info.innerHTML = "RED";
     },
     green: () => {
       //finish
-      user_info.innerHTML = "Finished receiving Data";
+      user_info.innerHTML = "GREEN";
     },
     blue: () => {
       //transition state
@@ -122,7 +146,12 @@ function stateMachine(color) {
     },
   };
   //user_info.innerHTML=`rgb(${color[0]},${color[1]},${color[2]})`
-  actions[real_state]();
+  if(actual_state!=prev_state){
+
+    actions[actual_state]();
+  }else{
+    user_info.innerHTML = "Did not change state";
+  }
 }
 function readCenterPixel(context, canvas) {
   var pixel = context.getImageData(
@@ -131,12 +160,13 @@ function readCenterPixel(context, canvas) {
     1,
     1
   );
-  var data = pixel.data;
-  var rgba =
-    "rgba(" + data[0] + "," + data[1] + "," + data[2] + "," + data[3] + ")";
-  document.getElementsByTagName("div")[0].style["background-color"] = rgba;
-  console.log(rgba[0]);
-  return data;
+  var data = pixel.data;// data in [r,g,b,a]
+  var hsl =RGBToHSL(data[0],data[1],data[2])
+  
+  var hsl2= "hsl(" + hsl[0] + "," + hsl[1] + "," + hsl[2] +")";
+  document.getElementsByTagName("div")[0].style["background-color"] = "rgba(" + data[0] + "," + data[1] + "," + data[2] + "," + data[3] + ")";
+  
+  return hsl;
 }
 function drawCaptureZone(ctx, canvas) {
   // Red rectangle
@@ -151,7 +181,7 @@ function drawCaptureZone(ctx, canvas) {
   );
   ctx.stroke();
 }
-function drawVideo() {
+function drawVideo(prev_color=null) {
   // Elements for taking the snapshot
   const canvas = document.getElementsByTagName("canvas")[0];
   const context = canvas.getContext("2d");
@@ -164,9 +194,9 @@ function drawVideo() {
     parseInt(canvas.height)
   );
   let color = readCenterPixel(context, canvas);
-  stateMachine(color);
+  stateMachine(color,prev_color);
   drawCaptureZone(context, canvas);
-  requestAnimationFrame(drawVideo);
+  requestAnimationFrame(()=>{drawVideo(color)});
 }
 //----------
 //Send Data algoritmos----
