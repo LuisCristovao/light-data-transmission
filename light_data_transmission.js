@@ -84,18 +84,18 @@ function createHomePage() {
 }
 
 // receive Data algoritmos ------
-function detectState(color){
+function detectState(color) {
   let real_state = "no state";
   //if red
-  if (color[0] <=31 ) {
+  if (color[0] <= 31) {
     real_state = "red";
   }
   //if green
-  if (color[0] >=98 & color[0]<=147) {
+  if ((color[0] >= 98) & (color[0] <= 147)) {
     real_state = "green";
   }
   //if blue
-  if (color[0] >=193 & color[0]<=244) {
+  if ((color[0] >= 193) & (color[0] <= 244)) {
     real_state = "blue";
   }
   //if white
@@ -106,16 +106,16 @@ function detectState(color){
   if (color[2] <= 3) {
     real_state = "black";
   }
-  return real_state
+  return real_state;
 }
-function stateMachine(color,prev_color) {
+function stateMachine(color, prev_color) {
   let actual_state = "no state";
-  let prev_state=actual_state
+  let prev_state = actual_state;
   let user_info = document.getElementsByTagName("h1")[0];
   //categorize state
-  actual_state=detectState(color)
-  prev_state=detectState(prev_color)
-  
+  actual_state = detectState(color);
+  prev_state = detectState(prev_color);
+
   let textarea_el = document.getElementsByTagName("textarea")[0];
   let actions = {
     red: () => {
@@ -146,10 +146,9 @@ function stateMachine(color,prev_color) {
     },
   };
   //user_info.innerHTML=`rgb(${color[0]},${color[1]},${color[2]})`
-  if(actual_state!=prev_state){
-
+  if (actual_state != prev_state) {
     actions[actual_state]();
-  }else{
+  } else {
     user_info.innerHTML = "Did not change state";
   }
 }
@@ -160,12 +159,13 @@ function readCenterPixel(context, canvas) {
     1,
     1
   );
-  var data = pixel.data;// data in [r,g,b,a]
-  var hsl =RGBToHSL(data[0],data[1],data[2])
-  
-  var hsl2= "hsl(" + hsl[0] + "," + hsl[1] + "," + hsl[2] +")";
-  document.getElementsByTagName("div")[0].style["background-color"] = "rgba(" + data[0] + "," + data[1] + "," + data[2] + "," + data[3] + ")";
-  
+  var data = pixel.data; // data in [r,g,b,a]
+  var hsl = RGBToHSL(data[0], data[1], data[2]);
+
+  var hsl2 = "hsl(" + hsl[0] + "," + hsl[1] + "," + hsl[2] + ")";
+  document.getElementsByTagName("div")[0].style["background-color"] =
+    "rgba(" + data[0] + "," + data[1] + "," + data[2] + "," + data[3] + ")";
+
   return hsl;
 }
 function drawCaptureZone(ctx, canvas) {
@@ -181,7 +181,7 @@ function drawCaptureZone(ctx, canvas) {
   );
   ctx.stroke();
 }
-function drawVideo(prev_color=null) {
+function drawVideo(prev_color = null) {
   // Elements for taking the snapshot
   const canvas = document.getElementsByTagName("canvas")[0];
   const context = canvas.getContext("2d");
@@ -194,9 +194,11 @@ function drawVideo(prev_color=null) {
     parseInt(canvas.height)
   );
   let color = readCenterPixel(context, canvas);
-  stateMachine(color,prev_color);
+  stateMachine(color, prev_color);
   drawCaptureZone(context, canvas);
-  requestAnimationFrame(()=>{drawVideo(color)});
+  requestAnimationFrame(() => {
+    drawVideo(color);
+  });
 }
 //----------
 //Send Data algoritmos----
@@ -224,7 +226,7 @@ function sendBits(bit, position, transition_state) {
     if (!transition_state) {
       state_machine[bit]();
     } else {
-      canvasColor("rgba(0,0,255)");
+      canvasColor("rgba(0,130,255)");
     }
   } catch {
     canvasColor("rgba(0,255,0)");
